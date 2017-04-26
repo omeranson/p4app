@@ -7,6 +7,18 @@ import struct
 from scapy.all import sendp, send
 from scapy.all import Packet
 from scapy.all import Ether, ARP
+
+class P4calc(Packet):
+    name = "P4calc"
+    fields_desc = [ StrFixedLenField("H", "H", length=1),
+                    StrFixedLenField("P", "P", length=1),
+                    XByteField("version", 0x01),
+                    StrFixedLenField("op", "+", length=1),
+                    IntField("operand_a", 0),
+                    IntField("operand_b", 0),
+                    IntField("result", 0xDEADBABE)]
+
+bind_layers(Ether, P4calc, type=0x1234)
                
 def main():
     
