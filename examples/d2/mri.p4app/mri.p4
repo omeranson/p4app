@@ -151,19 +151,26 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
     action drop() {
         mark_to_drop();
     }
+    
     action add_mri_option() {
 	hdr.ip_option.setValid();
-	// TODO: Populate with vaid options
-	
+        hdr.ip_option.copyFlag     = 1;
+        hdr.ip_option.optClass     = 2;  /* Debugging and Measurement */
+        hdr.ip_option.option       = IP_OPTION_MRI;
+        hdr.ip_option.optionLength = 4;  /* sizeof(ip_option) + sizeof(mri) */
+        
 	hdr.mri.setValid();
-	// TODO: Add 1 to ihl
+        hdr.mri.count = 0;
+        hdr.ipv4.ihl = hdr.ipv4.ihl + 1;
     }
-    action add_swid(switchID_t id) {
-	
-	hdr.mri.count = meta.ingress_metadata.count + 1;
+    
+    action add_swid(switchID_t id) {	
+	hdr.mri.count = hdr.mri.count + 1;
 	hdr.swids.push_front(1);
 	hdr.swids[0].swid = id;
-	// TODO: Add 1 to ihl
+
+        hdr.ipv4.ihl = hdr.ipv4.ihl + 1;
+        hdr.ip_option.optionLength = hdr.ip_option.optionLength + 4;	
     }
     
     action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
@@ -174,10 +181,8 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
     }
 
     table swid {
-	actions = { add_swid; NoAction; }
-	size = 1;
-	default_action = NoAction();
-
+	actions        = { add_swid; }
+	default_action = add_swid(0);        
     }
     
     table ipv4_lpm {
@@ -196,9 +201,11 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
     apply {
         if (hdr.ipv4.isValid()) {
             ipv4_lpm.apply();
-        }
-	if (hdr.mri.isValid()) {
-	    meta.ingress_metadata.count = hdr.mri.count;
+            
+	    if (!hdr.mri.isValid()) {
+                add_mri_option();
+            }    
+	    
 	    swid.apply();
 	}
     }
