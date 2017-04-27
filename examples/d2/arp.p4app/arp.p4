@@ -212,15 +212,15 @@ control MyIngress(
     }
 
     action send_arp_reply() {
-        hdr.ethernet.dstAddr = hdr.ethernet.srcAddr;
-        hdr.ethernet.srcAddr = meta.my_mac;
+        hdr.ethernet.dstAddr = hdr.arp_ipv4.sha;
+        hdr.ethernet.srcAddr = meta.mac_da;
         
         hdr.arp.oper         = ARP_OPER_REPLY;
         
-        hdr.arp_ipv4.sha     = meta.my_mac;
-        hdr.arp_ipv4.spa     = 0;
-        hdr.arp_ipv4.tha     = meta.mac_da;
-        hdr.arp_ipv4.tpa     = meta.dst_ipv4;
+        hdr.arp_ipv4.tha     = hdr.arp_ipv4.sha;
+        hdr.arp_ipv4.tpa     = hdr.arp_ipv4.spa;
+        hdr.arp_ipv4.sha     = meta.mac_da;
+        hdr.arp_ipv4.spa     = meta.dst_ipv4;
 
         standard_metadata.egress_spec = standard_metadata.ingress_port;
     }
