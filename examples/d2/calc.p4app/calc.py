@@ -35,26 +35,24 @@ class Token:
         self.type = type
         self.value = value
 
-def make_num_parser():
-    def parse(s, i, ts):
-        pattern = "^\s*([0-9]+)\s*"
-        match = re.match(pattern,s[i:])
-        if match:
-            ts.append(Token('num', match.group(1)))
-            return i + match.end(), ts
-        raise NumParseError('Expected number literal.')
-    return parse
+
+def num_parser(s, i, ts):
+    pattern = "^\s*([0-9]+)\s*"
+    match = re.match(pattern,s[i:])
+    if match:
+        ts.append(Token('num', match.group(1)))
+        return i + match.end(), ts
+    raise NumParseError('Expected number literal.')
 
 
-def make_op_parser():
-    def parse(s, i, ts):
-        pattern = "^\s*([-+&|^])\s*"
-        match = re.match(pattern,s[i:])
-        if match:
-            ts.append(Token('num', match.group(1)))
-            return i + match.end(), ts
-        raise NumParseError("Expected binary operator '-', '+', '&', '|', or '^'.")
-    return parse
+def op_parser(s, i, ts):
+    pattern = "^\s*([-+&|^])\s*"
+    match = re.match(pattern,s[i:])
+    if match:
+        ts.append(Token('num', match.group(1)))
+        return i + match.end(), ts
+    raise NumParseError("Expected binary operator '-', '+', '&', '|', or '^'.")
+
 
 def make_seq(p1, p2):    
     def parse(s, i, ts):
@@ -65,9 +63,7 @@ def make_seq(p1, p2):
 
 def main():
 
-    pn = make_num_parser()
-    po = make_op_parser()
-    p = make_seq(pn, make_seq(po,pn))    
+    p = make_seq(num_parser, make_seq(op_parser,num_parser))    
     s = ''
     iface = 'en0'
     
