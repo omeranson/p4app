@@ -31,7 +31,7 @@ def main():
 
     pkt = Ether() / IP(dst=addr, options = IPOption_MRI(count=2, swids=[3,4])) / UDP(dport=8000) / "hello"
     pkt.show2()
-    hexdump(pkt)
+    #hexdump(pkt)
     sendp(pkt, iface=iface)
 
 

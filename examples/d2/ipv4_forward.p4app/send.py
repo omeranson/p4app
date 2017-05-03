@@ -10,9 +10,11 @@ from scapy.all import Ether, IP, UDP
     
 def main():
     
-    pkt =  Ether(dst='ff:ff:ff:ff:ff:ff') / IP(dst='10.0.1.10') / UDP(dport=8000) / "hello"
-    pkt.show()
-    sendp(pkt, iface='h1-eth0')
+    addr = socket.gethostbyname(sys.argv[1])
+    iface = sys.argv[2]
+    pkt =  Ether(dst='ff:ff:ff:ff:ff:ff') / IP(dst=addr) / UDP(dport=8000) / "hello"
+    pkt.show2()
+    sendp(pkt, iface=iface)
     
 
 if __name__ == '__main__':
