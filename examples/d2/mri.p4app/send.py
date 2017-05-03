@@ -4,7 +4,7 @@ import socket
 import random
 import struct
 
-from scapy.all import sendp, send
+from scapy.all import sendp, send, hexdump
 from scapy.all import Packet, IPOption
 from scapy.all import Ether, IP, UDP
 from scapy.all import IntField, FieldListField, FieldLenField, ShortField
@@ -21,18 +21,19 @@ class IPOption_MRI(IPOption):
                     FieldListField("swids",
                                    [],
                                    IntField("", 0),
-                                   length_from=lambda pkt:pkt.count) ]
-            
-    
+                                   length_from=lambda pkt:pkt.count*4) ]
+
+
 def main():
-    
+
     addr = socket.gethostbyname(sys.argv[1])
     iface = sys.argv[2]
 
     pkt = Ether() / IP(dst=addr, options = IPOption_MRI(count=2, swids=[3,4])) / UDP(dport=8000) / "hello"
-    pkt.show()
+    pkt.show2()
+    hexdump(pkt)
     sendp(pkt, iface=iface)
-    
+
 
 if __name__ == '__main__':
     main()

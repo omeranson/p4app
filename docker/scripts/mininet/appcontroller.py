@@ -47,18 +47,18 @@ class AppController:
                     entries[sw] += extra_entries
                 else: # path to file that contains entries
                     entries[sw] += self.read_entries(extra_entries)
-            entries[sw] += [
-                'table_set_default send_frame _drop',
-                'table_set_default forward _drop',
-                'table_set_default ipv4_lpm _drop']
+            #entries[sw] += [
+            #    'table_set_default send_frame _drop',
+            #    'table_set_default forward _drop',
+            #    'table_set_default ipv4_lpm _drop']
 
         for host_name in self.topo._host_links:
             h = self.net.get(host_name)
             for link in self.topo._host_links[host_name].values():
                 sw = link['sw']
-                entries[sw].append('table_add send_frame rewrite_mac %d => %s' % (link['sw_port'], link['sw_mac']))
-                entries[sw].append('table_add forward set_dmac %s => %s' % (link['host_ip'], link['host_mac']))
-                entries[sw].append('table_add ipv4_lpm set_nhop %s/32 => %s %d' % (link['host_ip'], link['host_ip'], link['sw_port']))
+                #entries[sw].append('table_add send_frame rewrite_mac %d => %s' % (link['sw_port'], link['sw_mac']))
+                #entries[sw].append('table_add forward set_dmac %s => %s' % (link['host_ip'], link['host_mac']))
+                #entries[sw].append('table_add ipv4_lpm set_nhop %s/32 => %s %d' % (link['host_ip'], link['host_ip'], link['sw_port']))
                 iface = h.intfNames()[link['idx']]
                 h.cmd('ifconfig %s %s hw ether %s' % (iface, link['host_ip'], link['host_mac']))
                 h.cmd('arp -i %s -s %s %s' % (iface, link['sw_ip'], link['sw_mac']))
@@ -73,9 +73,9 @@ class AppController:
                 if not path: continue
                 if not path[1][0] == 's': continue # next hop is a switch
                 sw_link = self.topo._sw_links[sw.name][path[1]]
-                entries[sw.name].append('table_add send_frame rewrite_mac %d => %s' % (sw_link[0]['port'], sw_link[0]['mac']))
-                entries[sw.name].append('table_add forward set_dmac %s => %s' % (h_link['host_ip'], sw_link[1]['mac']))
-                entries[sw.name].append('table_add ipv4_lpm set_nhop %s/32 => %s %d' % (h_link['host_ip'], h_link['host_ip'], sw_link[0]['port']))
+                #entries[sw.name].append('table_add send_frame rewrite_mac %d => %s' % (sw_link[0]['port'], sw_link[0]['mac']))
+                #entries[sw.name].append('table_add forward set_dmac %s => %s' % (h_link['host_ip'], sw_link[1]['mac']))
+                #entries[sw.name].append('table_add ipv4_lpm set_nhop %s/32 => %s %d' % (h_link['host_ip'], h_link['host_ip'], sw_link[0]['port']))
 
             for h2 in self.net.hosts:
                 if h == h2: continue

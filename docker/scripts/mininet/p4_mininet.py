@@ -18,6 +18,7 @@ from mininet.node import Switch, Host
 from mininet.log import setLogLevel, info, error, debug
 from mininet.moduledeps import pathCheck
 from sys import exit
+from time import sleep
 import os
 import tempfile
 import socket
@@ -137,6 +138,7 @@ class P4Switch(Switch):
             self.cmd(' '.join(args) + ' >' + self.log_file + ' 2>&1 & echo $! >> ' + f.name)
             pid = int(f.read())
         debug("P4 switch {} PID is {}.\n".format(self.name, pid))
+        sleep(1)
         if not self.check_switch_started(pid):
             error("P4 switch {} did not start correctly.\n".format(self.name))
             exit(1)
